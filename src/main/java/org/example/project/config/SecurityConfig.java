@@ -34,10 +34,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        // Cho phép tất cả các API Auth và KYC upload (Public)
                         .requestMatchers("/api/auth/**", "/api/v1/kyc/upload").permitAll()
+
+                        // Phân quyền theo Role
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/v1/staff/**").hasRole("STAFF")
                         .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
+
+                        // Các API khác phải xác thực
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
